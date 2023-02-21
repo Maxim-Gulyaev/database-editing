@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ROOMsimpleapp</string>
+    <string name="button_output">output</string>
+    <string name="et_input">input</string>
+    <string name="enter_text">enter text</string>
+    <string name="input">btn_input</string>
+    <string name="value_saved">value is saved</string>
+    <string name="no_data">no data</string>
+    <string name="clear_table">clear table</string>
+</resources>
