@@ -6,6 +6,7 @@ import android.maxim.roomsimpleapp.database.UsersDao
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.maxim.roomsimpleapp.databinding.ActivityMainBinding
+import androidx.activity.viewModels
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
@@ -13,6 +14,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var db: UsersDao
     private lateinit var users: Users
+    val model by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,24 +27,21 @@ class MainActivity : AppCompatActivity() {
         binding.btnOutput.setOnClickListener { showUsers() }
         binding.btnClear.setOnClickListener { clearTable() }
 
-        users = Users(1, "ddddd")
+        users = Users(1, "initial name")
         db.insertUser(users)
     }
 
     private fun editData() {
-        val editedText = binding.etInput.text.toString()
-        users = Users(1, editedText)
-        db.updateUser(users)
+        val editText = binding.etInput.text.toString()
+        model.editData(editText)
     }
 
     private fun clearTable() {
-        db.clearTable()
+        model.clearTable()
     }
 
     private fun showUsers() {
-        val userName = db.getUsername()
-        val userId = db.getUserId().toString()
-        binding.tvOutput.text = userName
-        binding.tvId.text = userId
+        binding.tvOutput.text = model.showUsers().second
+        binding.tvId.text = model.showUsers().first.toString()
     }
 }
