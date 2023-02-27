@@ -7,10 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.maxim.roomsimpleapp.databinding.ActivityMainBinding
 import androidx.activity.viewModels
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
@@ -18,8 +15,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var db: UsersDao
     private lateinit var users: Users
-    val model by viewModels<MainViewModel>()
-    lateinit var disposable: Disposable
+    private val model by viewModels<MainViewModel>()
+    private var disposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,14 +51,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /*private fun getObservable(): Observable<Pair<Int, String>> {
-        return Observable.just(model.showUsers())
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-    }
-*/
     override fun onStop() {
         super.onStop()
-        disposable.dispose()
+        disposable?.dispose()
     }
 }
