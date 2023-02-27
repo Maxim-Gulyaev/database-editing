@@ -7,6 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.maxim.roomsimpleapp.databinding.ActivityMainBinding
 import androidx.activity.viewModels
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
@@ -15,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var db: UsersDao
     private lateinit var users: Users
     val model by viewModels<MainViewModel>()
+    lateinit var disposable: Disposable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +32,10 @@ class MainActivity : AppCompatActivity() {
         binding.btnOutput.setOnClickListener { showUsers() }
         binding.btnClear.setOnClickListener { clearTable() }
 
-        users = Users(1, "initial name")
-        db.insertUser(users)
+        thread {
+            users = Users(1, "initial name")
+            db.insertUser(users)
+        }
     }
 
     private fun editData() {
@@ -41,7 +48,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showUsers() {
-        binding.tvOutput.text = model.showUsers().second
-        binding.tvId.text = model.showUsers().first.toString()
+        disposable = model.getObservable().subscribe {
+            binding.tvOutput.text = it.second
+            binding.tvId.text = it.first.toString()
+        }
+    }
+
+    /*private fun getObservable(): Observable<Pair<Int, String>> {
+        return Observable.just(model.showUsers())
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+*/
+    override fun onStop() {
+        super.onStop()
+        disposable.dispose()
     }
 }
