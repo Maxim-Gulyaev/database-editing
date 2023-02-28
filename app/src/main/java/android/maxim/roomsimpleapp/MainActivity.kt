@@ -33,6 +33,11 @@ class MainActivity : AppCompatActivity() {
             users = Users(1, "initial name")
             db.insertUser(users)
         }
+
+        disposable = model.getObservable().subscribe {
+            binding.tvOutput.text = it.second
+            binding.tvId.text = it.first.toString()
+        }
     }
 
     private fun editData() {
