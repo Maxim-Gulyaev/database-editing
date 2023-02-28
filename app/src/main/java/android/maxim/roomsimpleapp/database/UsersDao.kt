@@ -1,12 +1,13 @@
 package android.maxim.roomsimpleapp.database
 
 import androidx.room.*
+import io.reactivex.rxjava3.core.Completable
 
 @Dao
 interface UsersDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertUser(users: Users)
+    fun insertUser(users: Users): Completable
 
     @Query("Select * from users")
     fun gelAllUsers(): Users
@@ -18,7 +19,7 @@ interface UsersDao {
     fun getUserId(): Int
 
     @Update
-    fun updateUser(users: Users)
+    fun updateUser(users: Users): Completable
 
     @Delete
     fun deleteUsers(users: Users)

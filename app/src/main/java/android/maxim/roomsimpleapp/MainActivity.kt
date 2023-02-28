@@ -7,7 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.maxim.roomsimpleapp.databinding.ActivityMainBinding
 import androidx.activity.viewModels
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
@@ -29,15 +31,8 @@ class MainActivity : AppCompatActivity() {
         binding.btnOutput.setOnClickListener { showUsers() }
         binding.btnClear.setOnClickListener { clearTable() }
 
-        thread {
-            users = Users(1, "initial name")
-            db.insertUser(users)
-        }
-
-        disposable = model.getObservable().subscribe {
-            binding.tvOutput.text = it.second
-            binding.tvId.text = it.first.toString()
-        }
+        model.setInitialValues()
+        this.showUsers()
     }
 
     private fun editData() {
@@ -50,7 +45,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showUsers() {
-        disposable = model.getObservable().subscribe {
+        disposable = model.getObservable()
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
             binding.tvOutput.text = it.second
             binding.tvId.text = it.first.toString()
         }
