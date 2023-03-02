@@ -1,19 +1,11 @@
 package android.maxim.roomsimpleapp
 
-import android.maxim.roomsimpleapp.database.AppDatabase
-import android.maxim.roomsimpleapp.database.Users
-import android.maxim.roomsimpleapp.database.UsersDao
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.maxim.roomsimpleapp.databinding.ActivityMainBinding
-import android.os.PersistableBundle
 import android.widget.Toast
 import androidx.activity.viewModels
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), MainViewModel.OnTaskCompleteListener {
 
@@ -38,23 +30,28 @@ class MainActivity : AppCompatActivity(), MainViewModel.OnTaskCompleteListener {
         binding.btnClear.setOnClickListener { clearTable() }
     }
 
-    private fun clearTable() {
-        model.clearTable(this)
+    private fun updateName() {
+        val name = binding.etInput.text.toString()
+        model.updateName(name, this)
     }
 
     private fun showUserName() {
         compositeDisposable.add(
-        model.getUserName()
-            .subscribe ({ data ->
-            binding.tvId.text = data.userId.toString()
-            binding.tvOutput.text = data.userName
-        }, {})
+            model.getUserName()
+                .subscribe ({ data ->
+                    binding.tvId.text = data.userId.toString()
+                    binding.tvOutput.text = data.userName
+                }, {
+                    Toast.makeText(this, "Table has no data", Toast.LENGTH_SHORT)
+                        .show()
+                    binding.tvId.text = resources.getString(R.string.no_data)
+                    binding.tvOutput.text = resources.getString(R.string.no_data)
+                })
         )
     }
 
-    private fun updateName() {
-        val name = binding.etInput.text.toString()
-        model.updateName(name, this)
+    private fun clearTable() {
+        model.clearTable(this)
     }
 
     override fun onTaskComplete(result: String) {
@@ -68,9 +65,9 @@ class MainActivity : AppCompatActivity(), MainViewModel.OnTaskCompleteListener {
         outState.putString("name", binding.tvOutput.text.toString())
     }
 
-    override fun onDetachedFromWindow() {
+    override fun onDestroy() {
+        super.onDestroy()
         compositeDisposable.clear()
-        super.onDetachedFromWindow()
     }
 }
 

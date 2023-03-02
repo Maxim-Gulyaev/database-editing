@@ -2,8 +2,6 @@ package android.maxim.roomsimpleapp.database
 
 import androidx.room.*
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Maybe
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 
 @Dao
@@ -12,7 +10,7 @@ interface UsersDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUser(users: Users): Completable
 
-    @Query("Select * from users")
+    @Query("SELECT * FROM users")
     fun getUsers(): Single<Users>
 
     @Update
@@ -23,5 +21,8 @@ interface UsersDao {
 
     @Query("DELETE FROM users")
     fun clearTable(): Completable
+
+    @Query("SELECT COUNT(*) FROM users")
+    fun ifTableEmpty(): Single<Int>
 
 }

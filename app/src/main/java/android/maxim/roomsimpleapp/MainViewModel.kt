@@ -3,20 +3,15 @@ package android.maxim.roomsimpleapp
 import android.app.Application
 import android.maxim.roomsimpleapp.database.AppDatabase
 import android.maxim.roomsimpleapp.database.Users
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlin.concurrent.thread
 
 class MainViewModel(application: Application) : AndroidViewModel(application){
 
     private val db = AppDatabase.getInstance(application)?.usersDao()!!
-    lateinit var disposable: Disposable
     private val compositeDisposable by lazy { CompositeDisposable() }
 
     interface OnTaskCompleteListener {
@@ -25,7 +20,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application){
 
     fun addInitialData(listener: OnTaskCompleteListener) {
         val user = Users(1, "initial name")
-
         compositeDisposable.add(
             db.insertUser(user)
             .subscribeOn(Schedulers.io())
@@ -46,7 +40,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application){
             db.updateUser(user)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { listener.onTaskComplete("Name is updated") }
+                .subscribe {
+                        listener.onTaskComplete("Name is updated")
+                }
         )
     }
 
